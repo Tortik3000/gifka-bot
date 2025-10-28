@@ -1,5 +1,5 @@
 ---
-- name: Deploy Telegram Bot with PostgreSQL
+- name: Deploy gifka bot
   hosts: all
   gather_facts: true
   vars_files:
@@ -34,6 +34,18 @@
         name: docker.io
         state: present
       become: yes
+
+    - name: Ensure ffmpeg is installed
+      become: yes
+      tasks:
+        - name: Update apt cache
+          apt:
+            update_cache: yes
+
+        - name: Install ffmpeg
+          apt:
+            name: ffmpeg
+            state: present
 
     - name: Create plugins directory if not exists
       file:
