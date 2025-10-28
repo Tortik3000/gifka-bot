@@ -33,7 +33,7 @@ func CreateBlackBox(img image.Image, outputPath, text string) error {
 
 	// Белый текст
 	dc.SetRGB(1, 1, 1)
-	err := dc.LoadFontFace("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf", 28)
+	err := dc.LoadFontFace("./text_style/LiberationSerif-Regular.ttf", 28)
 	if err != nil {
 		return err
 	}

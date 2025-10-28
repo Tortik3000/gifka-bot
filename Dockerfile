@@ -13,5 +13,6 @@ RUN apk update && apk add --no-cache \
 
 RUN mkdir -p bin
 COPY --from=builder /app/bin/gifka-bot ./bin/gifka-bot
+COPY --from=builder /app/text_style ./text_style
 
 CMD ["./bin/gifka-bot"]
