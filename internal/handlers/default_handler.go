@@ -8,10 +8,10 @@ import (
 	"github.com/go-telegram/ui/keyboard/inline"
 )
 
-func DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+func (h *Handler) DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	kb := inline.New(b).
 		Row().
-		Button("Create gif", []byte("create"), onInlineKeyboardSelect)
+		Button("Create gif", []byte("create"), h.onInlineKeyboardSelect)
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.Message.Chat.ID,
@@ -20,15 +20,15 @@ func DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	})
 }
 
-func onInlineKeyboardSelect(ctx context.Context, b *bot.Bot, mes models.MaybeInaccessibleMessage, data []byte) {
+func (h *Handler) onInlineKeyboardSelect(ctx context.Context, b *bot.Bot, mes models.MaybeInaccessibleMessage, data []byte) {
 	switch string(data) {
 	case "create":
-		CreateHandler(ctx, b, &models.Update{
+		h.CreateHandler(ctx, b, &models.Update{
 			Message: mes.Message,
 		})
 
 	default:
-		DefaultHandler(ctx, b, &models.Update{
+		h.DefaultHandler(ctx, b, &models.Update{
 			Message: mes.Message,
 		})
 	}

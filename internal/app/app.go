@@ -17,10 +17,11 @@ func Run(logger *zap.Logger) {
 	defer cancel()
 
 	cfg := config.New()
+	service := handlers.New(logger)
 	opts := []bot.Option{
-		bot.WithDefaultHandler(handlers.DefaultHandler),
-		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, handlers.StartHandler),
-		bot.WithMiddlewares(handlers.ConversationMiddleware),
+		bot.WithDefaultHandler(service.DefaultHandler),
+		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, service.StartHandler),
+		bot.WithMiddlewares(service.ConversationMiddleware),
 	}
 
 	b, err := bot.New(cfg.TG.Token, opts...)

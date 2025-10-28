@@ -9,7 +9,7 @@ import (
 	mp "gifka-bot/internal/media_processer"
 )
 
-func GifHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
+func (h *Handler) GifHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
 	chatID := update.Message.Chat.ID
 	fileID := update.Message.Animation.FileID
 	text := s.Text
@@ -33,6 +33,7 @@ func GifHandler(ctx context.Context, b *bot.Bot, update *models.Update, s sessio
 	})
 
 	if err != nil {
+		h.logger.Error(err.Error())
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error sending animation."})
 		return
 	}

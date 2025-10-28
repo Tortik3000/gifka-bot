@@ -10,7 +10,7 @@ import (
 	mp "gifka-bot/internal/media_processer"
 )
 
-func StickerHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
+func (h *Handler) StickerHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
 	chatID := update.Message.Chat.ID
 	sr := update.Message.Sticker
 	fileID := sr.FileID
@@ -48,6 +48,7 @@ func StickerHandler(ctx context.Context, b *bot.Bot, update *models.Update, s se
 	})
 
 	if err != nil {
+		h.logger.Error(err.Error())
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error sending sticker."})
 	}
 }

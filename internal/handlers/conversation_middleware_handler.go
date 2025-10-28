@@ -7,7 +7,7 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
-func ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
+func (h *Handler) ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		if update != nil && update.Message != nil {
 			chatID := update.Message.Chat.ID
