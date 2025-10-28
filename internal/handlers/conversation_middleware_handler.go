@@ -36,7 +36,7 @@ func ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
 						ChatID: chatID,
 						Text:   "GIF received! Text: \"" + s.Text + "\". Processing...",
 					})
-					GifHandler(ctx, b, update, s)
+					GifHandler(ctx, b, update, *s)
 					resetSession(chatID)
 					return
 				}
@@ -47,7 +47,7 @@ func ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
 						Text:   "Sticker received! Text: \"" + s.Text + "\". Processing...",
 					})
 
-					StickerHandler(ctx, b, update, s)
+					StickerHandler(ctx, b, update, *s)
 					resetSession(chatID)
 					return
 				}
