@@ -35,17 +35,16 @@
         state: present
       become: yes
 
-    - name: Ensure ffmpeg is installed
+    - name: Update apt cache
+      apt:
+        update_cache: yes
       become: yes
-      tasks:
-        - name: Update apt cache
-          apt:
-            update_cache: yes
 
-        - name: Install ffmpeg
-          apt:
-            name: ffmpeg
-            state: present
+    - name: Ensure ffmpeg is installed
+      apt:
+        name: ffmpeg
+        state: present
+      become: yes
 
     - name: Create plugins directory if not exists
       file:
