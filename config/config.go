@@ -1,9 +1,7 @@
 package config
 
 import (
-	"fmt"
-
-	"github.com/spf13/viper"
+	"os"
 )
 
 type (
@@ -16,16 +14,9 @@ type (
 )
 
 func New() *Config {
-	viper.SetConfigName("config")
-	viper.AddConfigPath("./")
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %w", err))
-	}
-
 	cfg := &Config{}
 
-	cfg.TG.Token = viper.GetString("tg_bot_token")
+	cfg.TG.Token = os.Getenv("TELEGRAM_BOT_TOKEN")
 
 	return cfg
 }
