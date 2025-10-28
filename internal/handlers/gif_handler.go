@@ -21,6 +21,10 @@ func (h *Handler) GifHandler(ctx context.Context, b *bot.Bot, update *models.Upd
 	}
 
 	processed, err := mp.VideoProcess(file, text)
+	if err != nil {
+		h.logger.Error(err.Error())
+		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: err.Error()})
+	}
 
 	video := &models.InputFileUpload{
 		Filename: "animation.mp4",

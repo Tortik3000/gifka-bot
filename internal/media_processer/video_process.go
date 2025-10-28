@@ -45,8 +45,7 @@ func VideoProcess(file *models.File, text string) (io.Reader, error) {
 
 	// извлекаем первый кадр
 	cmdFrame := exec.Command("ffmpeg", "-y", "-i", tempInput, "-frames:v", "1", framePNG)
-	if out, err := cmdFrame.CombinedOutput(); err != nil {
-		fmt.Println("Ошибка ffmpeg:", string(out))
+	if _, err := cmdFrame.CombinedOutput(); err != nil {
 		return nil, err
 	}
 	defer os.Remove(framePNG)
@@ -81,8 +80,7 @@ func VideoProcess(file *models.File, text string) (io.Reader, error) {
 	)
 	defer os.Remove(tempOutput)
 
-	if out, err := cmd.CombinedOutput(); err != nil {
-		fmt.Println("Ошибка сборки видео:", string(out))
+	if _, err := cmd.CombinedOutput(); err != nil {
 		return nil, err
 	}
 
