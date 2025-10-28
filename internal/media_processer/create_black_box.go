@@ -33,9 +33,12 @@ func CreateBlackBox(img image.Image, outputPath, text string) error {
 
 	// Белый текст
 	dc.SetRGB(1, 1, 1)
-	if err := dc.LoadFontFace("./text_style/LiberationSerif-Regular.ttf", 28); err == nil {
-		dc.DrawStringAnchored(text, float64(width)/2, float64(height)-30, 0.5, 0.5)
+	err := dc.LoadFontFace("./text_style/LiberationSerif-Regular.ttf", 28)
+	if err != nil {
+		return err
 	}
+
+	dc.DrawStringAnchored(text, float64(width)/2, float64(height)-30, 0.5, 0.5)
 
 	return dc.SavePNG(outputPath)
 }

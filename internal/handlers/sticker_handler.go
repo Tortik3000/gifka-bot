@@ -18,6 +18,7 @@ func (h *Handler) StickerHandler(ctx context.Context, b *bot.Bot, update *models
 
 	file, err := b.GetFile(ctx, &bot.GetFileParams{FileID: fileID})
 	if err != nil {
+		h.logger.Error(err.Error())
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error receiving file."})
 		return
 	}
@@ -33,6 +34,7 @@ func (h *Handler) StickerHandler(ctx context.Context, b *bot.Bot, update *models
 	}
 
 	if err != nil {
+		h.logger.Error(err.Error())
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error processing sticker."})
 		return
 	}

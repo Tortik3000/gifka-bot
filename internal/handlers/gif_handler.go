@@ -16,6 +16,7 @@ func (h *Handler) GifHandler(ctx context.Context, b *bot.Bot, update *models.Upd
 
 	file, err := b.GetFile(ctx, &bot.GetFileParams{FileID: fileID})
 	if err != nil {
+		h.logger.Error(err.Error())
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error receiving file."})
 		return
 	}
