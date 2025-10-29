@@ -1,4 +1,6 @@
 FROM golang:1.25-alpine AS builder
+RUN apk add --no-cache build-base libwebp-dev
+
 WORKDIR /app
 COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-s -w" -o bin/gifka-bot ./cmd/gifka-bot
