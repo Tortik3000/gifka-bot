@@ -10,7 +10,7 @@ import (
 	mp "gifka-bot/internal/media_processer"
 )
 
-func (h *Handler) StickerHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
+func (h *Handler) stickerHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
 	chatID := update.Message.Chat.ID
 	sr := update.Message.Sticker
 	fileID := sr.FileID

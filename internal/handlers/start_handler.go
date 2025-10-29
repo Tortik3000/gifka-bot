@@ -13,5 +13,5 @@ func (h *Handler) StartHandler(ctx context.Context, b *bot.Bot, update *models.U
 		Text:   "hi",
 	})
 
-	h.DefaultHandler(ctx, b, update)
+	h.CreateHandler(ctx, b, update)
 }

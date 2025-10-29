@@ -9,7 +9,7 @@ import (
 	mp "gifka-bot/internal/media_processer"
 )
 
-func (h *Handler) GifHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
+func (h *Handler) gifHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
 	chatID := update.Message.Chat.ID
 	fileID := update.Message.Animation.FileID
 	text := s.Text

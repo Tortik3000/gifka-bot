@@ -30,7 +30,6 @@ func VideoProcess(file *models.File, text string) (io.Reader, error) {
 	framePNG := "frame.png"
 	bgPNG := "background.png"
 
-	// сохраняем webm-файл
 	outFile, err := os.Create(tempInput)
 	if err != nil {
 		return nil, err

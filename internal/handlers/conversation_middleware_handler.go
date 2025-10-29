@@ -28,6 +28,7 @@ func (h *Handler) ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
 					Text:   "Text expected",
 				})
 				resetSession(chatID)
+				h.CreateHandler(ctx, b, update)
 				return
 
 			case stageAwaitGIFOrSticker:
@@ -36,8 +37,9 @@ func (h *Handler) ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
 						ChatID: chatID,
 						Text:   "GIF received! Text: \"" + s.Text + "\". Processing...",
 					})
-					h.GifHandler(ctx, b, update, *s)
+					h.gifHandler(ctx, b, update, *s)
 					resetSession(chatID)
+					h.CreateHandler(ctx, b, update)
 					return
 				}
 
@@ -47,8 +49,9 @@ func (h *Handler) ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
 						Text:   "Sticker received! Text: \"" + s.Text + "\". Processing...",
 					})
 
-					h.StickerHandler(ctx, b, update, *s)
+					h.stickerHandler(ctx, b, update, *s)
 					resetSession(chatID)
+					h.CreateHandler(ctx, b, update)
 					return
 				}
 
@@ -57,6 +60,7 @@ func (h *Handler) ConversationMiddleware(next bot.HandlerFunc) bot.HandlerFunc {
 					Text:   "Gif or Sticker expected",
 				})
 				resetSession(chatID)
+				h.CreateHandler(ctx, b, update)
 				return
 			default:
 			}

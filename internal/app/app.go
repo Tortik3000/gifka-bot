@@ -19,7 +19,7 @@ func Run(logger *zap.Logger) {
 	cfg := config.New()
 	service := handlers.New(logger)
 	opts := []bot.Option{
-		bot.WithDefaultHandler(service.DefaultHandler),
+		bot.WithDefaultHandler(service.CreateHandler),
 		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, service.StartHandler),
 		bot.WithMiddlewares(service.ConversationMiddleware),
 	}

@@ -2,13 +2,17 @@ package media_processer
 
 import (
 	"image"
+	"strings"
 
 	"github.com/fogleman/gg"
 )
 
 func CreateBlackBox(img image.Image, outputPath, text string) error {
+	lines := strings.Split(text, "\n")
+	lineHeight := 32.0
+
 	width := img.Bounds().Dx() + 100
-	height := img.Bounds().Dy() + 100
+	height := img.Bounds().Dy() + 100 + int(lineHeight)*len(lines)
 	if width%2 != 0 {
 		width++
 	}
@@ -38,7 +42,11 @@ func CreateBlackBox(img image.Image, outputPath, text string) error {
 		return err
 	}
 
-	dc.DrawStringAnchored(text, float64(width)/2, float64(height)-30, 0.5, 0.5)
+	startY := float64(height) - float64(len(lines))*lineHeight - 20
+	for i, line := range lines {
+		y := startY + float64(i)*lineHeight
+		dc.DrawStringAnchored(line, float64(width)/2, y, 0.5, 0.5)
+	}
 
 	return dc.SavePNG(outputPath)
 }

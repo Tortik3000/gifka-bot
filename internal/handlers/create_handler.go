@@ -9,18 +9,31 @@ import (
 )
 
 func (h *Handler) CreateHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	var chatID int64
+
+	switch {
+	case update.Message != nil:
+		chatID = update.Message.Chat.ID
+	case update.CallbackQuery != nil && update.CallbackQuery.Message.InaccessibleMessage != nil:
+		chatID = update.CallbackQuery.Message.InaccessibleMessage.Chat.ID
+	default:
+	}
+
 	kb := inline.New(b).
 		Row().
-		Button("Add Black Box", []byte(blackBox), h.AddText)
+		Button("Add Black Box", []byte(blackBox), h.addText)
 
-	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:      update.Message.Chat.ID,
+	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:      chatID,
 		Text:        "Choose source:",
 		ReplyMarkup: kb,
 	})
+	if err != nil {
+		return
+	}
 }
 
-func (h *Handler) AddText(ctx context.Context, b *bot.Bot, mes models.MaybeInaccessibleMessage, data []byte) {
+func (h *Handler) addText(ctx context.Context, b *bot.Bot, mes models.MaybeInaccessibleMessage, data []byte) {
 	chatID := mes.Message.Chat.ID
 
 	s := getSession(chatID)
