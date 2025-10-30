@@ -1,4 +1,4 @@
-package media_processer
+package media_processor
 
 import (
 	"bytes"
@@ -10,20 +10,18 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/go-telegram/bot/models"
 )
 
-func VideoProcess(file *models.File, text string) (io.Reader, error) {
+func VideoProcess(filePath string, text string) (io.Reader, error) {
 	cfg := config.New()
-	fileURL := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", cfg.TG.Token, file.FilePath)
+	fileURL := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", cfg.TG.Token, filePath)
 	resp, err := http.Get(fileURL)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	extension := filepath.Ext(file.FilePath)
+	extension := filepath.Ext(filePath)
 
 	tempInput := "temp_input" + extension
 	tempOutput := "temp_output" + extension
@@ -65,16 +63,20 @@ func VideoProcess(file *models.File, text string) (io.Reader, error) {
 	}
 	defer os.Remove(bgPNG)
 
-	// накладываем фон на видео и кодируем обратно в webm
 	cmd := exec.Command(
 		"ffmpeg", "-y",
 		"-loop", "1", "-i", bgPNG,
 		"-i", tempInput,
-		"-filter_complex", "[0:v][1:v]overlay=50:50:shortest=1",
+		"-filter_complex", "[0:v][1:v]overlay=50:50:shortest=1,scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos", // Добавлен scale для ресайза
 		"-c:v", "libvpx-vp9",
-		"-b:v", "1M",
-		"-pix_fmt", "yuv420p",
-		"-an", "-shortest",
+		"-b:v", "500K", // Битрейт снижен до 500K
+		"-maxrate", "500K",
+		"-bufsize", "1000K",
+		"-pix_fmt", "yuva420p", // Формат с альфа-каналом для прозрачности
+		"-an",
+		"-t", "3", // Ограничение длительности 3 секунды
+		"-quality", "good",
+		"-crf", "37", // Увеличение CRF для большего сжатия
 		tempOutput,
 	)
 	defer os.Remove(tempOutput)

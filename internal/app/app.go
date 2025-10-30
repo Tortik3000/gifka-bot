@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
-	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/go-telegram/bot"
 	"go.uber.org/zap"
@@ -13,7 +13,7 @@ import (
 )
 
 func Run(logger *zap.Logger) {
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
 	cfg := config.New()

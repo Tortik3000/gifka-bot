@@ -6,7 +6,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	mp "gifka-bot/internal/media_processer"
+	mp "gifka-bot/internal/media_processor"
 )
 
 func (h *Handler) gifHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
@@ -21,7 +21,7 @@ func (h *Handler) gifHandler(ctx context.Context, b *bot.Bot, update *models.Upd
 		return
 	}
 
-	processed, err := mp.VideoProcess(file, text)
+	processed, err := mp.VideoProcess(file.FilePath, text)
 	if err != nil {
 		h.logger.Error(err.Error())
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error processing video."})

@@ -1,4 +1,4 @@
-package media_processer
+package media_processor
 
 import (
 	"image"

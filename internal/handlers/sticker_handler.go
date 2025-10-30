@@ -3,17 +3,18 @@ package handlers
 import (
 	"context"
 	"io"
+	"path/filepath"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	mp "gifka-bot/internal/media_processer"
+	mp "gifka-bot/internal/media_processor"
 )
 
 func (h *Handler) stickerHandler(ctx context.Context, b *bot.Bot, update *models.Update, s session) {
 	chatID := update.Message.Chat.ID
-	sr := update.Message.Sticker
-	fileID := sr.FileID
+	sticker := update.Message.Sticker
+	fileID := sticker.FileID
 	text := s.Text
 
 	file, err := b.GetFile(ctx, &bot.GetFileParams{FileID: fileID})
@@ -24,33 +25,26 @@ func (h *Handler) stickerHandler(ctx context.Context, b *bot.Bot, update *models
 	}
 
 	var processed io.Reader
-	var fileName string
-	if !sr.IsVideo {
-		fileName = "sticker.webp"
-		processed, err = mp.WEBPProcessor(file, text)
-	} else {
-		fileName = "sticker.webm"
-		processed, err = mp.VideoProcess(file, text)
-	}
+	processed, err = mp.StickerProcessor(file.FilePath, text)
 
 	if err != nil {
 		h.logger.Error(err.Error())
-		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error processing sticker."})
+		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error processing returnSticker."})
 		return
 	}
 
-	sticker := &models.InputFileUpload{
-		Filename: fileName,
+	extension := filepath.Ext(file.FilePath)
+	returnSticker := &models.InputFileUpload{
+		Filename: "returnSticker" + extension,
 		Data:     processed,
 	}
 
 	_, err = b.SendSticker(ctx, &bot.SendStickerParams{
 		ChatID:  chatID,
-		Sticker: sticker,
+		Sticker: returnSticker,
 	})
-
 	if err != nil {
 		h.logger.Error(err.Error())
-		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error sending sticker."})
+		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error sending returnSticker."})
 	}
 }
