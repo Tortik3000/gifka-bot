@@ -6,4 +6,4 @@
     - group_vars/vars.yml
 
   roles:
-    - role: gifka-bot
+    - role: roles/docker_compose
