@@ -25,7 +25,7 @@ func (h *Handler) stickerHandler(ctx context.Context, b *bot.Bot, update *models
 	}
 
 	var processed io.Reader
-	processed, err = mp.StickerProcessor(file.FilePath, text)
+	processed, err = mp.StickerProcessor(file.FilePath, text, s.TypeGif)
 
 	if err != nil {
 		h.logger.Error(err.Error())

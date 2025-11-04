@@ -21,7 +21,9 @@ func (h *Handler) CreateHandler(ctx context.Context, b *bot.Bot, update *models.
 
 	kb := inline.New(b).
 		Row().
-		Button("Add Black Box", []byte(blackBox), h.addText)
+		Button("Add Black Box", []byte(BlackBox), h.addText).
+		Row().
+		Button("Add White Text", []byte(AddText), h.addText)
 
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      chatID,

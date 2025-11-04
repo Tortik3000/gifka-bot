@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"gifka-bot/config"
+	"gifka-bot/internal/entity"
+
 	"image/png"
 	"io"
 	"net/http"
@@ -12,7 +14,7 @@ import (
 	"path/filepath"
 )
 
-func VideoProcess(filePath string, text string) (io.Reader, error) {
+func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Reader, error) {
 	cfg := config.New()
 	fileURL := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", cfg.TG.Token, filePath)
 	resp, err := http.Get(fileURL)
@@ -58,7 +60,7 @@ func VideoProcess(filePath string, text string) (io.Reader, error) {
 		return nil, err
 	}
 
-	if err := CreateBlackBox(img, bgPNG, text); err != nil {
+	if err := choiceImgProcess(img, bgPNG, text, typeGif); err != nil {
 		return nil, err
 	}
 	defer os.Remove(bgPNG)

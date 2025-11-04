@@ -1,9 +1,12 @@
 package media_processor
 
-import "io"
+import (
+	"gifka-bot/internal/entity"
+	"io"
+)
 
-func WEBMProcessor(filePath string, text string) (io.Reader, error) {
-	processed, err := VideoProcess(filePath, text)
+func WEBMProcessor(filePath string, text string, typeGif entity.TypeGif) (io.Reader, error) {
+	processed, err := VideoProcess(filePath, text, typeGif)
 
 	return processed, err
 }

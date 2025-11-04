@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"gifka-bot/config"
+	"gifka-bot/internal/entity"
 	"image"
 	"image/png"
 	"io"
@@ -14,14 +15,14 @@ import (
 	"github.com/disintegration/imaging"
 )
 
-func WEBPProcessor(filePath string, text string) (io.Reader, error) {
+func WEBPProcessor(filePath string, text string, typyGif entity.TypeGif) (io.Reader, error) {
 	img, err := getImgFromWEBPFile(filePath)
 	if err != nil {
 		return nil, err
 	}
 
 	outPngPath := "out.png"
-	err = CreateBlackBox(img, outPngPath, text)
+	err = choiceImgProcess(img, outPngPath, text, typyGif)
 	if err != nil {
 		return nil, err
 	}

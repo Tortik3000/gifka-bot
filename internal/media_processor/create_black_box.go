@@ -7,7 +7,7 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func CreateBlackBox(img image.Image, outputPath, text string) error {
+func createBlackBox(img image.Image, outputPath, text string) error {
 	lines := strings.Split(text, "\n")
 	lineHeight := 32.0
 
