@@ -110,7 +110,7 @@ ansible-vault encrypt bot_playbook/group_vars/vars.yml
 
 Ручной деплой:
 ```bash
-ansible-playbook -i bot_playbook/inventories/gifka-bot.ini bot_playbook/deploy.yml
+ansible-playbook -i bot_playbook/inventories/gifka-bot.ini bot_playbook/site.yml
 ```
 
 ---
