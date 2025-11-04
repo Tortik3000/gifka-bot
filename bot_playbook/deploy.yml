@@ -81,8 +81,7 @@
         files:
           - "{{ docker_compose_file }}"
         pull: always
-      environment:
-        TELEGRAM_BOT_TOKEN: "{{ TELEGRAM_BOT_TOKEN }}"
+      environment: "{{ docker_compose_environment }}"
       become: yes
 
     - name: Deploy services with Docker Compose
@@ -94,6 +93,5 @@
         recreate: always
         build: always
         remove_orphans: yes
-      environment:
-        TELEGRAM_BOT_TOKEN: "{{ TELEGRAM_BOT_TOKEN }}"
+      environment: "{{ docker_compose_environment }}"
       become: yes
