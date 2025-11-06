@@ -99,18 +99,18 @@ bot_playbook/
 
 Шифрование переменных окружения (рекомендуется):
 ```bash
-ansible-vault encrypt bot_playbook/group_vars/vars.yml
+  ansible-vault encrypt bot_playbook/group_vars/vars.yml
 ```
 
 Пример инвентори (`bot_playbook/inventories/gifka-bot.ini`):
 ```ini
-[all]
-<vm-host> ansible_ssh_port=<ssh-port> ansible_ssh_user=<ssh-user>
+    [all]
+    <vm-host> ansible_ssh_port=<ssh-port> ansible_ssh_user=<ssh-user>
 ```
 
 Ручной деплой:
 ```bash
-ansible-playbook -i bot_playbook/inventories/gifka-bot.ini bot_playbook/site.yml
+  ansible-playbook -i bot_playbook/inventories/gifka-bot.ini bot_playbook/site.yml
 ```
 
 ---

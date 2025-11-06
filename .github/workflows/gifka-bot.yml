@@ -42,5 +42,8 @@ jobs:
         with:
           playbook: bot_playbook/site.yml
           directory: .
+          inventory: |
+            [all]
+            ${{secrets.ANSIBLE_HOST}} ansible_ssh_port=${{secrets.ANSIBLE_SSH_PORT}} ansible_ssh_user=${{secrets.ANSIBLE_SSH_USER}}
           key: ${{secrets.SSH_PRIV_KEY}}
           options: --verbose

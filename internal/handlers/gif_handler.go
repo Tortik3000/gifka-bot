@@ -21,7 +21,7 @@ func (h *Handler) gifHandler(ctx context.Context, b *bot.Bot, update *models.Upd
 		return
 	}
 
-	processed, err := mp.VideoProcess(file.FilePath, text)
+	processed, err := mp.VideoProcess(file.FilePath, text, s.TypeGif)
 	if err != nil {
 		h.logger.Error(err.Error())
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error processing video."})

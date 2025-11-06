@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"gifka-bot/internal/entity"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -21,7 +22,9 @@ func (h *Handler) CreateHandler(ctx context.Context, b *bot.Bot, update *models.
 
 	kb := inline.New(b).
 		Row().
-		Button("Add Black Box", []byte(blackBox), h.addText)
+		Button("Add Black Box", []byte(entity.BlackBox), h.addText).
+		Row().
+		Button("Add White Text(don't work)", []byte(entity.AddText), h.addText)
 
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      chatID,
@@ -39,7 +42,7 @@ func (h *Handler) addText(ctx context.Context, b *bot.Bot, mes models.MaybeInacc
 	s := getSession(chatID)
 	s.Stage = stageAwaitText
 	s.Text = ""
-	s.TypeGif = TypeGif(data)
+	s.TypeGif = entity.TypeGif(data)
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: chatID,

@@ -1,6 +1,9 @@
 package handlers
 
-import "sync"
+import (
+	"gifka-bot/internal/entity"
+	"sync"
+)
 
 type convStage int
 
@@ -10,16 +13,9 @@ const (
 	stageAwaitGIFOrSticker
 )
 
-type TypeGif string
-
-const (
-	addText  TypeGif = "addText"
-	blackBox TypeGif = "blackBox"
-)
-
 type session struct {
 	Stage   convStage
-	TypeGif TypeGif
+	TypeGif entity.TypeGif
 	Text    string
 }
 
