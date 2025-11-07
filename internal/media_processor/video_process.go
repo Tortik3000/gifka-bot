@@ -76,7 +76,6 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		"-bufsize", "1000K",
 		"-pix_fmt", "yuva420p", // Формат с альфа-каналом для прозрачности
 		"-an",
-		"-t", "3", // Ограничение длительности 3 секунды
 		"-quality", "good",
 		"-crf", "37", // Увеличение CRF для большего сжатия
 		tempOutput,
