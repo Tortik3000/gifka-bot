@@ -64,40 +64,24 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 	}
 	defer os.Remove(bgPNG)
 
-	// Создаём фейковый контейнер (1 кадр, 0.03 сек)
-	fakeContainer := "fake_container.webm"
-	cmdFake := exec.Command(
-		"ffmpeg", "-y",
-		"-i", tempInput,
-		"-frames:v", "1", // 1 кадр
-		"-t", "0.03", // Duration контейнера
-		"-c:v", "libvpx-vp9",
-		"-pix_fmt", "yuva420p",
-		"-metadata", "title=TelegramSticker",
-		fakeContainer,
-	)
-	if _, err := cmdFake.CombinedOutput(); err != nil {
-		return nil, err
-	}
-	defer os.Remove(fakeContainer)
-
 	// Overlay реального видео на фон
-	cmdOverlay := exec.Command(
+	cmd := exec.Command(
 		"ffmpeg", "-y",
-		"-loop", "1", "-i", bgPNG, // фон, повторяется
-		"-i", tempInput, // реальное видео
-		"-filter_complex",
-		"[1:v]scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2[vid];"+
-			"[0:v][vid]overlay=(W-w)/2:(H-h)/2",
+		"-loop", "1", "-i", bgPNG,
+		"-i", tempInput,
+		"-filter_complex", "[0:v][1:v]overlay=50:50:shortest=1,scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos", // Добавлен scale для ресайза
 		"-c:v", "libvpx-vp9",
-		"-pix_fmt", "yuva420p",
-		"-b:v", "300K",
-		"-crf", "32",
-		"-deadline", "good",
+		"-b:v", "500K", // Битрейт снижен до 500K
+		"-maxrate", "500K",
+		"-bufsize", "1000K",
+		"-pix_fmt", "yuva420p", // Формат с альфа-каналом для прозрачности
 		"-an",
+		"-quality", "good",
+		"-crf", "37", // Увеличение CRF для большего сжатия
 		tempOutput,
 	)
-	if _, err := cmdOverlay.CombinedOutput(); err != nil {
+
+	if _, err := cmd.CombinedOutput(); err != nil {
 		return nil, err
 	}
 	defer os.Remove(tempOutput)
