@@ -64,12 +64,13 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 	}
 	defer os.Remove(bgPNG)
 
-	// Создаём "фейковый" контейнер с Duration = 0.03 сек
+	// Создаём фейковый контейнер (1 кадр, 0.03 сек)
 	fakeContainer := "fake_container.webm"
 	cmdFake := exec.Command(
 		"ffmpeg", "-y",
 		"-i", tempInput,
-		"-t", "0.03",
+		"-frames:v", "1", // 1 кадр
+		"-t", "0.03", // Duration контейнера
 		"-c:v", "libvpx-vp9",
 		"-pix_fmt", "yuva420p",
 		"-metadata", "title=TelegramSticker",
@@ -80,11 +81,11 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 	}
 	defer os.Remove(fakeContainer)
 
-	// Накладываем реальное видео поверх фона
+	// Overlay реального видео на фон
 	cmdOverlay := exec.Command(
 		"ffmpeg", "-y",
-		"-loop", "1", "-t", "0.1", "-i", bgPNG, // фон 0.1 сек
-		"-i", fakeContainer,
+		"-loop", "1", "-i", bgPNG, // фон, повторяется
+		"-i", tempInput, // реальное видео
 		"-filter_complex",
 		"[1:v]scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2[vid];"+
 			"[0:v][vid]overlay=(W-w)/2:(H-h)/2",
@@ -96,11 +97,10 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		"-an",
 		tempOutput,
 	)
-	defer os.Remove(tempOutput)
-
 	if _, err := cmdOverlay.CombinedOutput(); err != nil {
 		return nil, err
 	}
+	defer os.Remove(tempOutput)
 
 	// Читаем готовое видео в память
 	processedData, err := os.ReadFile(tempOutput)
