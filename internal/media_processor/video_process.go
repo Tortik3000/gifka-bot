@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gifka-bot/config"
 	"gifka-bot/internal/entity"
+
 	"image/png"
 	"io"
 	"net/http"
@@ -16,7 +17,6 @@ import (
 func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Reader, error) {
 	cfg := config.New()
 	fileURL := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", cfg.TG.Token, filePath)
-
 	resp, err := http.Get(fileURL)
 	if err != nil {
 		return nil, err
@@ -24,12 +24,12 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 	defer resp.Body.Close()
 
 	extension := filepath.Ext(filePath)
+
 	tempInput := "temp_input" + extension
 	tempOutput := "temp_output" + extension
 	framePNG := "frame.png"
 	bgPNG := "background.png"
 
-	// Сохраняем входное видео
 	outFile, err := os.Create(tempInput)
 	if err != nil {
 		return nil, err
@@ -42,14 +42,14 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 	}
 	outFile.Close()
 
-	// Извлекаем первый кадр
+	// извлекаем первый кадр
 	cmdFrame := exec.Command("ffmpeg", "-y", "-i", tempInput, "-frames:v", "1", framePNG)
 	if _, err := cmdFrame.CombinedOutput(); err != nil {
 		return nil, err
 	}
 	defer os.Remove(framePNG)
 
-	// Создаём фон с текстом
+	// создаем фон с текстом
 	f, err := os.Open(framePNG)
 	if err != nil {
 		return nil, err
@@ -59,12 +59,12 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 	if err != nil {
 		return nil, err
 	}
+
 	if err := choiceImgProcess(img, bgPNG, text, typeGif); err != nil {
 		return nil, err
 	}
 	defer os.Remove(bgPNG)
 
-	// Overlay реального видео на фон
 	cmd := exec.Command(
 		"ffmpeg", "-y",
 		"-loop", "1", "-i", bgPNG,
@@ -80,13 +80,13 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		"-crf", "37", // Увеличение CRF для большего сжатия
 		tempOutput,
 	)
+	defer os.Remove(tempOutput)
 
 	if _, err := cmd.CombinedOutput(); err != nil {
 		return nil, err
 	}
-	defer os.Remove(tempOutput)
 
-	// Читаем готовое видео в память
+	// читаем готовое видео в память
 	processedData, err := os.ReadFile(tempOutput)
 	if err != nil {
 		return nil, err
