@@ -86,11 +86,15 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		return nil, err
 	}
 
-	// читаем готовое видео в память
-	processedData, err := os.ReadFile(tempOutput)
+	hacked := "temp_hacked.webm"
+	if err := HackWebMDuration(tempOutput, hacked); err != nil {
+		return nil, err
+	}
+	defer os.Remove(hacked)
+
+	processedData, err := os.ReadFile(hacked)
 	if err != nil {
 		return nil, err
 	}
-
 	return bytes.NewReader(processedData), nil
 }
