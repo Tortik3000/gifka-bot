@@ -3,8 +3,6 @@ package media_processor
 import (
 	"bytes"
 	"fmt"
-	"gifka-bot/config"
-	"gifka-bot/internal/entity"
 
 	"image/png"
 	"io"
@@ -12,6 +10,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"gifka-bot/config"
+	"gifka-bot/internal/entity"
 )
 
 func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Reader, error) {
@@ -71,13 +72,13 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		"-i", tempInput,
 		"-filter_complex", "[0:v][1:v]overlay=50:50:shortest=1,scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos", // Добавлен scale для ресайза
 		"-c:v", "libvpx-vp9",
-		"-b:v", "500K", // Битрейт снижен до 500K
+		"-b:v", "500K",
 		"-maxrate", "500K",
 		"-bufsize", "1000K",
-		"-pix_fmt", "yuva420p", // Формат с альфа-каналом для прозрачности
+		"-pix_fmt", "yuva420p",
 		"-an",
 		"-quality", "good",
-		"-crf", "37", // Увеличение CRF для большего сжатия
+		"-crf", "37",
 		tempOutput,
 	)
 	defer os.Remove(tempOutput)

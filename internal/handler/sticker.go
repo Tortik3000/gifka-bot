@@ -1,13 +1,13 @@
-// internal/handler/sticker.go
 package handler
 
 import (
 	"context"
 	"path/filepath"
 
+	"go.uber.org/zap"
+
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
-	"go.uber.org/zap"
 )
 
 func (h *Handler) Sticker(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -26,13 +26,13 @@ func (h *Handler) Sticker(ctx context.Context, b *bot.Bot, update *models.Update
 		return
 	}
 
-	sess, _, err := h.sessionUseCase.Manager.Get(chatID)
-	if err != nil || sess == nil {
+	session, err := h.sessionUseCase.Get(chatID)
+	if err != nil || session == nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Session not found, please start over."})
 		return
 	}
 
-	processed, err := h.mediaUseCase.ProcessSticker(file.FilePath, sess.Text, sess.TypeGif)
+	processed, err := h.mediaUseCase.ProcessSticker(file.FilePath, session.Text, session.TypeGif)
 	if err != nil {
 		h.logger.Error("process sticker", zap.Error(err))
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Error processing sticker."})
@@ -56,5 +56,5 @@ func (h *Handler) Sticker(ctx context.Context, b *bot.Bot, update *models.Update
 	}
 
 	h.convUseCase.Finish(chatID)
-	h.Create(ctx, b, update)
+	h.Default(ctx, b, update)
 }

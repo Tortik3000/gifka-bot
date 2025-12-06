@@ -1,8 +1,9 @@
 package media_processor
 
 import (
-	"gifka-bot/internal/entity"
 	"io"
+
+	"gifka-bot/internal/entity"
 )
 
 func WEBMProcessor(filePath string, text string, typeGif entity.TypeGif) (io.Reader, error) {

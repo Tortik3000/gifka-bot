@@ -1,25 +1,24 @@
 package usecase
 
 import (
+	"go.uber.org/zap"
+
 	"gifka-bot/internal/entity"
 	"gifka-bot/internal/session"
-
-	"go.uber.org/zap"
 )
 
 type ConversationService struct {
-	sessions *session.Manager
+	sessions sessionManager
 	logger   *zap.Logger
 }
 
-func NewConversationService(m *session.Manager, logger *zap.Logger) *ConversationService {
+func NewConversationService(m sessionManager, logger *zap.Logger) *ConversationService {
 	return &ConversationService{
 		sessions: m,
 		logger:   logger,
 	}
 }
 
-// Начать сценарий "добавить текст"
 func (s *ConversationService) StartAddText(chatID int64, t entity.TypeGif) error {
 	sess := &session.Session{
 		Stage:   session.StageAwaitText,
@@ -29,20 +28,18 @@ func (s *ConversationService) StartAddText(chatID int64, t entity.TypeGif) error
 	return s.sessions.Set(chatID, sess)
 }
 
-// Обработка сообщения с текстом
 func (s *ConversationService) HandleText(chatID int64, text string) (*session.Session, string, error) {
 	sess, ok, err := s.sessions.Get(chatID)
 	if err != nil {
 		return nil, "", err
 	}
 	if !ok || sess.Stage != session.StageAwaitText {
-		return nil, "Неожиданный текст. Нажмите кнопку ещё раз.", nil
+		return nil, "Unexpected text. Press the button again.", nil
 	}
 
 	if text == "" {
-		// сбрасываем сессию
 		_ = s.sessions.Reset(chatID)
-		return nil, "Ожидался текст, попробуйте ещё раз.", nil
+		return nil, "Expected text, please try again.", nil
 	}
 
 	sess.Text = text
@@ -51,10 +48,9 @@ func (s *ConversationService) HandleText(chatID int64, text string) (*session.Se
 		return nil, "", err
 	}
 
-	return sess, "Текст получен. Теперь пришлите GIF или стикер.", nil
+	return sess, "Text received. Now send a GIF or sticker.", nil
 }
 
-// Проверка, что сообщение с GIF/стикером ожидается
 func (s *ConversationService) ExpectMedia(chatID int64) (*session.Session, bool, error) {
 	sess, ok, err := s.sessions.Get(chatID)
 	if err != nil || !ok {

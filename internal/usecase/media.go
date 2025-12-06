@@ -1,21 +1,19 @@
-// internal/service/media.go
 package usecase
 
 import (
 	"io"
 
-	"gifka-bot/internal/entity"
-	"gifka-bot/internal/media_processor"
-
 	"go.uber.org/zap"
+
+	"gifka-bot/internal/entity"
 )
 
 type MediaService struct {
-	processor media_processor.Processor
+	processor mediaProcessor
 	logger    *zap.Logger
 }
 
-func NewMediaService(p media_processor.Processor, logger *zap.Logger) *MediaService {
+func NewMediaService(p mediaProcessor, logger *zap.Logger) *MediaService {
 	return &MediaService{
 		processor: p,
 		logger:    logger,

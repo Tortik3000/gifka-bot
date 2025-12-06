@@ -6,9 +6,6 @@ import (
 	"gifka-bot/internal/entity"
 )
 
-// Здесь вы можете просто обернуть вашу существующую логику.
-// В примере предполагаются функции VideoProcess и StickerProcessor, как у вас.
-
 type Processor interface {
 	ProcessVideo(filePath, text string, t entity.TypeGif) (io.Reader, error)
 	ProcessSticker(filePath, text string, t entity.TypeGif) (io.Reader, error)

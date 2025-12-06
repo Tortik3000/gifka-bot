@@ -1,12 +1,12 @@
-// internal/handler/gif.go
 package handler
 
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
-	"go.uber.org/zap"
 )
 
 func (h *Handler) GIF(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -24,7 +24,7 @@ func (h *Handler) GIF(ctx context.Context, b *bot.Bot, update *models.Update) {
 		return
 	}
 
-	sess, _, err := h.sessionUseCase.Manager.Get(chatID)
+	sess, err := h.sessionUseCase.Get(chatID)
 	if err != nil || sess == nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Session not found, please start over."})
 		return
@@ -53,5 +53,5 @@ func (h *Handler) GIF(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 
 	h.convUseCase.Finish(chatID)
-	h.Create(ctx, b, update)
+	h.Default(ctx, b, update)
 }

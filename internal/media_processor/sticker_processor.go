@@ -1,9 +1,10 @@
 package media_processor
 
 import (
-	"gifka-bot/internal/entity"
 	"io"
 	"path/filepath"
+
+	"gifka-bot/internal/entity"
 )
 
 func StickerProcessor(filePath string, text string, typeGif entity.TypeGif) (processed io.Reader, err error) {
@@ -17,5 +18,4 @@ func StickerProcessor(filePath string, text string, typeGif entity.TypeGif) (pro
 	}
 
 	return processed, err
-
 }

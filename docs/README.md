@@ -78,8 +78,6 @@ make build
 
 - `TELEGRAM_BOT_TOKEN` — токен Telegram‑бота (обязателен)
 
-Файл `config/config.go` — минимальный провайдер конфигурации.
-
 ---
 
 ## CI/CD и деплой через Ansible
@@ -113,16 +111,6 @@ bot_playbook/
   ansible-playbook -i bot_playbook/inventories/gifka-bot.ini bot_playbook/site.yml
 ```
 
----
-
-## Архитектура и ключевые файлы
-
-- `cmd/gifka-bot/main.go` — точка входа
-- `internal/app/app.go` — инициализация бота, регистрация хендлеров и middleware
-- `internal/handlers/*` — обработчики команд, сообщений и сценариев
-- `internal/media_processor/*` — обработка изображений/видео, генерация подписи
-- `docker-compose.yml`, `Dockerfile` — контейнеризация
-- `ansible.cfg`, `bot_playbook/` — деплой
 
 ---
 

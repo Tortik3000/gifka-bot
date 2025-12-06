@@ -3,8 +3,6 @@ package media_processor
 import (
 	"bytes"
 	"fmt"
-	"gifka-bot/config"
-	"gifka-bot/internal/entity"
 	"image"
 	"image/png"
 	"io"
@@ -13,6 +11,9 @@ import (
 
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+
+	"gifka-bot/config"
+	"gifka-bot/internal/entity"
 )
 
 func WEBPProcessor(filePath string, text string, typyGif entity.TypeGif) (io.Reader, error) {
@@ -80,15 +81,12 @@ func resizeToExactStickerSize(img image.Image) (image.Image, error) {
 		resized = imaging.Resize(img, 0, size, imaging.Lanczos)
 	}
 
-	// Создаем квадратное изображение 512x512 с прозрачным фоном
 	dst := image.NewNRGBA(image.Rect(0, 0, size, size))
 
-	// Центрируем изображение
 	resizedBounds := resized.Bounds()
 	offsetX := (size - resizedBounds.Dx()) / 2
 	offsetY := (size - resizedBounds.Dy()) / 2
 
-	// Копируем ресайзнутое изображение в центр
 	for y := 0; y < resizedBounds.Dy(); y++ {
 		for x := 0; x < resizedBounds.Dx(); x++ {
 			dst.Set(x+offsetX, y+offsetY, resized.At(x, y))

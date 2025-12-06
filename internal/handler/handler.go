@@ -1,28 +1,26 @@
-// internal/handler/handler.go
 package handler
 
 import (
 	"context"
 
-	"gifka-bot/internal/usecase"
+	"go.uber.org/zap"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
-	"go.uber.org/zap"
 )
 
 type Handler struct {
 	logger         *zap.Logger
-	mediaUseCase   *usecase.MediaService
-	convUseCase    *usecase.ConversationService
-	sessionUseCase *usecase.SessionService
+	mediaUseCase   mediaUseCase
+	convUseCase    conversationUseCase
+	sessionUseCase sessionUseCase
 }
 
 func New(
 	logger *zap.Logger,
-	mediaUseCase *usecase.MediaService,
-	convUseCase *usecase.ConversationService,
-	sessionUseCase *usecase.SessionService,
+	mediaUseCase mediaUseCase,
+	convUseCase conversationUseCase,
+	sessionUseCase sessionUseCase,
 ) *Handler {
 	return &Handler{
 		logger:         logger,
@@ -32,17 +30,6 @@ func New(
 	}
 }
 
-// Default — если ничего не сматчилось
-func (h *Handler) Default(ctx context.Context, b *bot.Bot, update *models.Update) {
-	if update.Message != nil {
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: update.Message.Chat.ID,
-			Text:   "Use /start to get started.",
-		})
-	}
-}
-
-// Callback для inline‑кнопок
 func (h *Handler) Callback(ctx context.Context, b *bot.Bot, update *models.Update) {
 	if update.CallbackQuery == nil {
 		return

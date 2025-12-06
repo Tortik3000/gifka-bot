@@ -1,4 +1,3 @@
-// internal/session/session.go
 package session
 
 import "gifka-bot/internal/entity"

@@ -2,15 +2,15 @@ package usecase
 
 import "gifka-bot/internal/session"
 
-type SessionService struct {
-	Manager *session.Manager
+type SessionUseCase struct {
+	Manager sessionManager
 }
 
-func NewSessionService(m *session.Manager) *SessionService {
-	return &SessionService{Manager: m}
+func NewSessionService(m sessionManager) *SessionUseCase {
+	return &SessionUseCase{Manager: m}
 }
 
-func (s *SessionService) GetOrCreate(chatID int64) (*session.Session, error) {
+func (s *SessionUseCase) GetOrCreate(chatID int64) (*session.Session, error) {
 	sess, ok, err := s.Manager.Get(chatID)
 	if err != nil {
 		return nil, err
@@ -21,5 +21,14 @@ func (s *SessionService) GetOrCreate(chatID int64) (*session.Session, error) {
 			return nil, err
 		}
 	}
+	return sess, nil
+}
+
+func (s *SessionUseCase) Get(chatID int64) (*session.Session, error) {
+	sess, ok, err := s.Manager.Get(chatID)
+	if err != nil || !ok {
+		return nil, err
+	}
+
 	return sess, nil
 }

@@ -8,17 +8,15 @@ import (
 	"os"
 )
 
-// PatchWebMDuration патчит Duration в WebM файле и возвращает модифицированные данные
-func PatchWebMDuration(filePath string, newDurationMs float64) ([]byte, error) {
+func patchWebMDuration(filePath string, newDurationMs float64) ([]byte, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file: %w", err)
 	}
-	return PatchWebMDurationBytes(data, newDurationMs)
+	return patchWebMDurationBytes(data, newDurationMs)
 }
 
-// PatchWebMDurationBytes патчит Duration в WebM данных (slice байтов)
-func PatchWebMDurationBytes(data []byte, newDurationMs float64) ([]byte, error) {
+func patchWebMDurationBytes(data []byte, newDurationMs float64) ([]byte, error) {
 	// EBML ID элемента Duration: 0x4489
 	durationID := []byte{0x44, 0x89}
 	idx := findBytesPattern(data, durationID)
@@ -27,7 +25,6 @@ func PatchWebMDurationBytes(data []byte, newDurationMs float64) ([]byte, error) 
 		return nil, fmt.Errorf("duration element not found")
 	}
 
-	// Создаём копию данных для модификации
 	result := make([]byte, len(data))
 	copy(result, data)
 
@@ -50,16 +47,14 @@ func PatchWebMDurationBytes(data []byte, newDurationMs float64) ([]byte, error) 
 	return result, nil
 }
 
-// PatchWebMDurationReader патчит Duration и возвращает *bytes.Reader
 func PatchWebMDurationReader(data []byte, newDurationMs float64) (*bytes.Reader, error) {
-	patchedData, err := PatchWebMDurationBytes(data, newDurationMs)
+	patchedData, err := patchWebMDurationBytes(data, newDurationMs)
 	if err != nil {
 		return nil, err
 	}
 	return bytes.NewReader(patchedData), nil
 }
 
-// findBytesPattern ищет первое вхождение pattern в data
 func findBytesPattern(data, pattern []byte) int {
 	for i := 0; i <= len(data)-len(pattern); i++ {
 		found := true
