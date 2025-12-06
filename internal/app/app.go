@@ -9,7 +9,11 @@ import (
 	"go.uber.org/zap"
 
 	"gifka-bot/config"
-	"gifka-bot/internal/handlers"
+	"gifka-bot/internal/handler"
+	"gifka-bot/internal/media_processor"
+	"gifka-bot/internal/middleware"
+	"gifka-bot/internal/session"
+	"gifka-bot/internal/usecase"
 )
 
 func Run(logger *zap.Logger) {
@@ -17,17 +21,37 @@ func Run(logger *zap.Logger) {
 	defer cancel()
 
 	cfg := config.New()
-	service := handlers.New(logger)
+
+	if err := runBot(ctx, cfg, logger); err != nil {
+		logger.Fatal("bot stopped with error", zap.Error(err))
+	}
+}
+
+func runBot(ctx context.Context, cfg *config.Config, logger *zap.Logger) error {
+	mp := media_processor.New()
+	sessionStorage := session.NewInMemoryStorage()
+	sessionManager := session.NewManager(sessionStorage)
+
+	mediaUseCase := usecase.NewMediaService(mp, logger)
+	convUseCase := usecase.NewConversationService(sessionManager, logger)
+	sessionUseCase := usecase.NewSessionService(sessionManager)
+
+	h := handler.New(logger, mediaUseCase, convUseCase, sessionUseCase)
+
+	conversation := middleware.NewConversation(sessionManager, convUseCase, h)
+
 	opts := []bot.Option{
-		bot.WithDefaultHandler(service.CreateHandler),
-		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, service.StartHandler),
-		bot.WithMiddlewares(service.ConversationMiddleware),
+		bot.WithDefaultHandler(h.Default),
+		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.Start),
+		bot.WithMiddlewares(conversation.Handle),
 	}
 
 	b, err := bot.New(cfg.TG.Token, opts...)
 	if err != nil {
-		logger.Fatal("can't initialize bot", zap.Error(err))
+		return err
 	}
 
+	logger.Info("telegram bot started")
 	b.Start(ctx)
+	return nil
 }
