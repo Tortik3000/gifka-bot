@@ -1,52 +1,120 @@
 package media_processor
 
 import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
+	"math"
 	"os"
-
-	"github.com/ebml-go/webm"
 )
 
-func HackWebMDuration(inPath, outPath string) error {
-	f, err := os.Open(inPath)
+// PatchWebMDuration патчит Duration в WebM файле и возвращает модифицированные данные
+func PatchWebMDuration(filePath string, newDurationMs float64) ([]byte, error) {
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error reading file: %w", err)
 	}
-	defer f.Close()
+	return PatchWebMDurationBytes(data, newDurationMs)
+}
 
-	// m будет заполнен структурой WebM (Segment, Info, Tracks, и т.п.)
-	var m webm.WebM
+// PatchWebMDurationBytes патчит Duration в WebM данных (slice байтов)
+func PatchWebMDurationBytes(data []byte, newDurationMs float64) ([]byte, error) {
+	// EBML ID элемента Duration: 0x4489
+	durationID := []byte{0x44, 0x89}
+	idx := findBytesPattern(data, durationID)
 
-	// Parse: читает контейнер, заполняет m и возвращает Reader
-	// сигнатура из документации: func Parse(r io.ReadSeeker, m *WebM) (wr *Reader, err error)
-	r, err := webm.Parse(f, &m)
+	if idx == -1 {
+		return nil, fmt.Errorf("duration element not found")
+	}
+
+	// Создаём копию данных для модификации
+	result := make([]byte, len(data))
+	copy(result, data)
+
+	// После ID идёт размер элемента (VINT)
+	sizePos := idx + 2
+	size, sizeLen := readVINT(data[sizePos:])
+	valuePos := sizePos + sizeLen
+
+	// Записываем новое значение Duration
+	if size == 4 {
+		bits := math.Float32bits(float32(newDurationMs))
+		binary.BigEndian.PutUint32(result[valuePos:valuePos+4], bits)
+	} else if size == 8 {
+		bits := math.Float64bits(newDurationMs)
+		binary.BigEndian.PutUint64(result[valuePos:valuePos+8], bits)
+	} else {
+		return nil, fmt.Errorf("unexpected duration size: %d", size)
+	}
+
+	return result, nil
+}
+
+// PatchWebMDurationReader патчит Duration и возвращает *bytes.Reader
+func PatchWebMDurationReader(data []byte, newDurationMs float64) (*bytes.Reader, error) {
+	patchedData, err := PatchWebMDurationBytes(data, newDurationMs)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_ = r // Reader можно использовать, если нужно проходить по фреймам
+	return bytes.NewReader(patchedData), nil
+}
 
-	// 1. Укорачиваем контейнерную длительность
-	// смотри в GoDoc, как именно хранится Duration (обычно float64/float32 в Info)
-
-	m.Segment.Duration = 0.03 // 30 ms – то, что ffmpeg покажет как Duration в Input
-
-	// 2. Вешаем длинный DURATION в метаданные видео‑трека
-	// ниже – общая идея, реальные поля зависят от структуры WebM
-
-	// 3. Сериализация обратно
-	// В этом месте нужно использовать реальный writer из ebml-go/webm,
-	// если он есть (например, webm.NewWriter / (*Writer).Write),
-	// или отдельный EBML‑writer из этого же репозитория.
-	out, err := os.Create(outPath)
-	if err != nil {
-		return err
+// findBytesPattern ищет первое вхождение pattern в data
+func findBytesPattern(data, pattern []byte) int {
+	for i := 0; i <= len(data)-len(pattern); i++ {
+		found := true
+		for j := 0; j < len(pattern); j++ {
+			if data[i+j] != pattern[j] {
+				found = false
+				break
+			}
+		}
+		if found {
+			return i
+		}
 	}
-	defer out.Close()
+	return -1
+}
 
-	// Псевдо‑строка: замените на реальные вызовы из пакета
-	// err = webm.Write(out, &m)
-	// if err != nil {
-	//     return err
-	// }
+// readVINT читает EBML Variable Integer и возвращает значение и длину
+func readVINT(data []byte) (int, int) {
+	if len(data) == 0 {
+		return 0, 0
+	}
 
-	return nil
+	first := data[0]
+	var length int
+	var mask byte
+
+	switch {
+	case first&0x80 != 0:
+		length, mask = 1, 0x7F
+	case first&0x40 != 0:
+		length, mask = 2, 0x3F
+	case first&0x20 != 0:
+		length, mask = 3, 0x1F
+	case first&0x10 != 0:
+		length, mask = 4, 0x0F
+	case first&0x08 != 0:
+		length, mask = 5, 0x07
+	case first&0x04 != 0:
+		length, mask = 6, 0x03
+	case first&0x02 != 0:
+		length, mask = 7, 0x01
+	case first&0x01 != 0:
+		length, mask = 8, 0x00
+	default:
+		return 0, 0
+	}
+
+	if len(data) < length {
+		return 0, 0
+	}
+
+	value := int(first & mask)
+	for i := 1; i < length; i++ {
+		value = (value << 8) | int(data[i])
+	}
+
+	return value, length
 }

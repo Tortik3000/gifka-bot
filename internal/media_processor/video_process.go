@@ -86,15 +86,17 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		return nil, err
 	}
 
-	hacked := "temp_hacked.webm"
-	if err := HackWebMDuration(tempOutput, hacked); err != nil {
-		return nil, err
-	}
-	defer os.Remove(hacked)
-
-	processedData, err := os.ReadFile(hacked)
+	processedData, err := os.ReadFile(tempOutput)
 	if err != nil {
 		return nil, err
 	}
-	return bytes.NewReader(processedData), nil
+
+	// Патчим Duration на 30ms (или другое значение)
+	patchedReader, err := PatchWebMDurationReader(processedData, 30.0)
+	if err != nil {
+		// Если Duration не найден, возвращаем оригинальные данные
+		return bytes.NewReader(processedData), nil
+	}
+
+	return patchedReader, nil
 }
