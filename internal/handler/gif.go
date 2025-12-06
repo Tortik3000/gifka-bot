@@ -24,13 +24,13 @@ func (h *Handler) GIF(ctx context.Context, b *bot.Bot, update *models.Update) {
 		return
 	}
 
-	sess, _, err := h.sessionSvc.Manager.Get(chatID)
+	sess, _, err := h.sessionUseCase.Manager.Get(chatID)
 	if err != nil || sess == nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "Session not found, please start over."})
 		return
 	}
 
-	processed, err := h.mediaSvc.ProcessGIF(file.FilePath, sess.Text, sess.TypeGif)
+	processed, err := h.mediaUseCase.ProcessGIF(file.FilePath, sess.Text, sess.TypeGif)
 	if err != nil {
 		h.logger.Error("process gif", zap.Error(err))
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatID, Text: "GIF processing error."})
@@ -52,6 +52,6 @@ func (h *Handler) GIF(ctx context.Context, b *bot.Bot, update *models.Update) {
 		return
 	}
 
-	h.convSvc.Finish(chatID)
+	h.convUseCase.Finish(chatID)
 	h.Create(ctx, b, update)
 }

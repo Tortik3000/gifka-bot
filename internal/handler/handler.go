@@ -12,23 +12,23 @@ import (
 )
 
 type Handler struct {
-	logger     *zap.Logger
-	mediaSvc   *usecase.MediaService
-	convSvc    *usecase.ConversationService
-	sessionSvc *usecase.SessionService
+	logger         *zap.Logger
+	mediaUseCase   *usecase.MediaService
+	convUseCase    *usecase.ConversationService
+	sessionUseCase *usecase.SessionService
 }
 
 func New(
 	logger *zap.Logger,
-	mediaSvc *usecase.MediaService,
-	convSvc *usecase.ConversationService,
-	sessSvc *usecase.SessionService,
+	mediaUseCase *usecase.MediaService,
+	convUseCase *usecase.ConversationService,
+	sessionUseCase *usecase.SessionService,
 ) *Handler {
 	return &Handler{
-		logger:     logger,
-		mediaSvc:   mediaSvc,
-		convSvc:    convSvc,
-		sessionSvc: sessSvc,
+		logger:         logger,
+		mediaUseCase:   mediaUseCase,
+		convUseCase:    convUseCase,
+		sessionUseCase: sessionUseCase,
 	}
 }
 

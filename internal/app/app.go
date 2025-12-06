@@ -5,7 +5,6 @@ import (
 	"context"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/go-telegram/bot"
 	"go.uber.org/zap"
@@ -51,7 +50,7 @@ func runBot(ctx context.Context, cfg *config.Config, logger *zap.Logger) error {
 		bot.WithDefaultHandler(h.Create), // раньше CreateHandler
 		bot.WithMessageTextHandler("/start", bot.MatchTypeExact, h.Start),
 		bot.WithMiddlewares(conversation.Handle), // middleware как метод Handler
-		bot.WithHTTPClient(10*time.Second, nil),
+		//bot.WithHTTPClient(10*time.Second, bot.HttpClient()),
 	}
 
 	b, err := bot.New(cfg.TG.Token, opts...)

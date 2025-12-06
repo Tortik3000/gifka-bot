@@ -41,7 +41,7 @@ func (h *Handler) AddTextCallback(ctx context.Context, b *bot.Bot, mes models.Ma
 	t := entity.TypeGif(data)
 
 	// запускаем сценарий
-	_ = h.convSvc.StartAddText(chatID, t)
+	_ = h.convUseCase.StartAddText(chatID, t)
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: chatID,
