@@ -1,3 +1,4 @@
 config.yaml
 bin
 .vault_pass.txt
+.idea
