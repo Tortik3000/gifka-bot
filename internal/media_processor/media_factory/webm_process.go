@@ -9,11 +9,6 @@ import (
 type WebmProcessor struct{}
 
 func (w *WebmProcessor) Process(filePath string, text string, t entity.TypeGif) (io.Reader, error) {
-	return WEBMProcessor(filePath, text, t)
-}
-
-func WEBMProcessor(filePath string, text string, typeGif entity.TypeGif) (io.Reader, error) {
-	processed, err := VideoProcess(filePath, text, typeGif)
-
-	return processed, err
+	videoProcessor := VideoProcessor{}
+	return videoProcessor.Process(filePath, text, t)
 }

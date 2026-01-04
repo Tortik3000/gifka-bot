@@ -7,7 +7,13 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func CreateBlackBox(img image.Image, outputPath, text string) error {
+type blackBoxProcessor struct{}
+
+func (p *blackBoxProcessor) Process(img image.Image, outputPath, text string) error {
+	return createBlackBox(img, outputPath, text)
+}
+
+func createBlackBox(img image.Image, outputPath, text string) error {
 	lines := strings.Split(text, "\n")
 	lineHeight := 32.0
 

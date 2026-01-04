@@ -14,23 +14,23 @@ import (
 
 	"gifka-bot/config"
 	"gifka-bot/internal/entity"
-	"gifka-bot/internal/media_processor/image_factory"
+	imageFactory "gifka-bot/internal/media_processor/image_factory"
 )
 
 type WebpProcessor struct{}
 
 func (w *WebpProcessor) Process(filePath string, text string, t entity.TypeGif) (io.Reader, error) {
-	return WEBPProcessor(filePath, text, t)
+	return webpProcessor(filePath, text, t)
 }
 
-func WEBPProcessor(filePath string, text string, typyGif entity.TypeGif) (io.Reader, error) {
+func webpProcessor(filePath string, text string, typyGif entity.TypeGif) (io.Reader, error) {
 	img, err := getImgFromWEBPFile(filePath)
 	if err != nil {
 		return nil, err
 	}
 
 	outPngPath := "out.png"
-	factory := image_factory.NewImageProcessorFactory()
+	factory := imageFactory.NewImageProcessorFactory()
 	processor, err := factory.GetProcessor(typyGif)
 	if err != nil {
 		return nil, err

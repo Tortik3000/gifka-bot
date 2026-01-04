@@ -27,9 +27,3 @@ func (f *ImageProcessorFactory) GetProcessor(typeGif entity.TypeGif) (ImageProce
 		return nil, errors.New("unknown gif type")
 	}
 }
-
-type blackBoxProcessor struct{}
-
-func (p *blackBoxProcessor) Process(img image.Image, outputPath, text string) error {
-	return CreateBlackBox(img, outputPath, text)
-}

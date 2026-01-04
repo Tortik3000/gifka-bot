@@ -13,7 +13,7 @@ import (
 
 	"gifka-bot/config"
 	"gifka-bot/internal/entity"
-	"gifka-bot/internal/media_processor/image_factory"
+	imageFactory "gifka-bot/internal/media_processor/image_factory"
 )
 
 type VideoProcessor struct{}
@@ -68,7 +68,7 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		return nil, err
 	}
 
-	factory := image_factory.NewImageProcessorFactory()
+	factory := imageFactory.NewImageProcessorFactory()
 	processor, err := factory.GetProcessor(typeGif)
 	if err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		return nil, err
 	}
 
-	// Патчим Duration на 30ms (или другое значение)
+	// Патчим Duration на 30ms
 	patchedReader, err := PatchWebMDurationReader(processedData, 30.0)
 	if err != nil {
 		// Если Duration не найден, возвращаем оригинальные данные
