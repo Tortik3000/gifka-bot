@@ -1,4 +1,4 @@
-package media_processor
+package media_factory
 
 import (
 	"bytes"
@@ -14,7 +14,14 @@ import (
 
 	"gifka-bot/config"
 	"gifka-bot/internal/entity"
+	"gifka-bot/internal/media_processor/image_factory"
 )
+
+type WebpProcessor struct{}
+
+func (w *WebpProcessor) Process(filePath string, text string, t entity.TypeGif) (io.Reader, error) {
+	return WEBPProcessor(filePath, text, t)
+}
 
 func WEBPProcessor(filePath string, text string, typyGif entity.TypeGif) (io.Reader, error) {
 	img, err := getImgFromWEBPFile(filePath)
@@ -23,7 +30,13 @@ func WEBPProcessor(filePath string, text string, typyGif entity.TypeGif) (io.Rea
 	}
 
 	outPngPath := "out.png"
-	err = choiceImgProcess(img, outPngPath, text, typyGif)
+	factory := image_factory.NewImageProcessorFactory()
+	processor, err := factory.GetProcessor(typyGif)
+	if err != nil {
+		return nil, err
+	}
+
+	err = processor.Process(img, outPngPath, text)
 	if err != nil {
 		return nil, err
 	}

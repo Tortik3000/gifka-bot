@@ -1,4 +1,4 @@
-package media_processor
+package image_factory
 
 import (
 	"image"
@@ -7,7 +7,7 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func createBlackBox(img image.Image, outputPath, text string) error {
+func CreateBlackBox(img image.Image, outputPath, text string) error {
 	lines := strings.Split(text, "\n")
 	lineHeight := 32.0
 

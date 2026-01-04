@@ -1,4 +1,4 @@
-package media_processor
+package media_factory
 
 import (
 	"bytes"
@@ -13,7 +13,14 @@ import (
 
 	"gifka-bot/config"
 	"gifka-bot/internal/entity"
+	"gifka-bot/internal/media_processor/image_factory"
 )
+
+type VideoProcessor struct{}
+
+func (v *VideoProcessor) Process(filePath string, text string, t entity.TypeGif) (io.Reader, error) {
+	return VideoProcess(filePath, text, t)
+}
 
 func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Reader, error) {
 	cfg := config.New()
@@ -61,7 +68,13 @@ func VideoProcess(filePath string, text string, typeGif entity.TypeGif) (io.Read
 		return nil, err
 	}
 
-	if err := choiceImgProcess(img, bgPNG, text, typeGif); err != nil {
+	factory := image_factory.NewImageProcessorFactory()
+	processor, err := factory.GetProcessor(typeGif)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := processor.Process(img, bgPNG, text); err != nil {
 		return nil, err
 	}
 	defer os.Remove(bgPNG)

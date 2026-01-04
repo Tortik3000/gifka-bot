@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"gifka-bot/internal/entity"
+	"gifka-bot/internal/media_processor/media_factory"
 )
 
 type Processor interface {
@@ -11,16 +12,28 @@ type Processor interface {
 	ProcessSticker(filePath, text string, t entity.TypeGif) (io.Reader, error)
 }
 
-type defaultProcessor struct{}
+type defaultProcessor struct {
+	factory *media_factory.ProcessorFactory
+}
 
 func New() Processor {
-	return &defaultProcessor{}
+	return &defaultProcessor{
+		factory: media_factory.NewProcessorFactory(),
+	}
 }
 
 func (p *defaultProcessor) ProcessVideo(filePath, text string, t entity.TypeGif) (io.Reader, error) {
-	return VideoProcess(filePath, text, t)
+	processor, err := p.factory.GetProcessor(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return processor.Process(filePath, text, t)
 }
 
 func (p *defaultProcessor) ProcessSticker(filePath, text string, t entity.TypeGif) (io.Reader, error) {
-	return StickerProcessor(filePath, text, t)
+	processor, err := p.factory.GetProcessor(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return processor.Process(filePath, text, t)
 }

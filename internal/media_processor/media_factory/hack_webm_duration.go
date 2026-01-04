@@ -1,19 +1,18 @@
-package media_processor
+package media_factory
 
 import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
 	"math"
-	"os"
 )
 
-func patchWebMDuration(filePath string, newDurationMs float64) ([]byte, error) {
-	data, err := os.ReadFile(filePath)
+func PatchWebMDurationReader(data []byte, newDurationMs float64) (*bytes.Reader, error) {
+	patchedData, err := patchWebMDurationBytes(data, newDurationMs)
 	if err != nil {
-		return nil, fmt.Errorf("error reading file: %w", err)
+		return nil, err
 	}
-	return patchWebMDurationBytes(data, newDurationMs)
+	return bytes.NewReader(patchedData), nil
 }
 
 func patchWebMDurationBytes(data []byte, newDurationMs float64) ([]byte, error) {
@@ -45,14 +44,6 @@ func patchWebMDurationBytes(data []byte, newDurationMs float64) ([]byte, error) 
 	}
 
 	return result, nil
-}
-
-func PatchWebMDurationReader(data []byte, newDurationMs float64) (*bytes.Reader, error) {
-	patchedData, err := patchWebMDurationBytes(data, newDurationMs)
-	if err != nil {
-		return nil, err
-	}
-	return bytes.NewReader(patchedData), nil
 }
 
 func findBytesPattern(data, pattern []byte) int {
